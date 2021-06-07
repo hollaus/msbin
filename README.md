@@ -2,6 +2,8 @@
 
 This dataset is named _MSBin_ which stands for MultiSpectral Document Binarization. The dataset is dedicated to the (document image) binarization of multispectral images. The dataset is introduced in [[Hollaus et al. 2019]](#[Hollaus-et-al.-2019]).
 
+![Example of the dataset](example_800.jpg)
+
 ## Download
 The dataset is on Zenodo:
 
@@ -25,19 +27,17 @@ Note that this is the second version of the dataset, where 10 images are removed
     │       └── fg_2            # Foreground 2 (red ink)    
 
 The encoding for the ground-truth images in the _labels_ folders is detailed below.
-The encoding in the _dibco_labels_ folders follows the _DIBCO_ convention: Black is foreground and white is background. Additionally, the weights for Pseudo-Recall and Pseudo-Precision [[XXX]](XXX) are included in these folders.
+The encoding in the _dibco_labels_ folders follows the _DIBCO_ [[Pratikakis et al. 2019]](#[Pratikakis-et-al.-2019]) convention: Black is foreground and white is background. Additionally, the weights for Pseudo-Recall and Pseudo-Precision [[Pratikakis et al. 2019]](#[Pratikakis-et-al.-2019] are included in these folders.
+
 
 ## Usage
-
-<!-- TODO: requirements -->
 
 File:
 ```binar_eval.py```
 
-
 ```bash
 usage: binar_eval.py [-h] [-dt] [--path_dibco_bin [PATH_DIBCO_BIN]]
-                     [--fg_type [FG_TYPE]] [-s]
+                     [-fg_type [FG_TYPE]] [-s] [-f] [-i]
                      path_gt path_img path_csv
 
 positional arguments:
@@ -49,11 +49,39 @@ optional arguments:
   -h, --help            show this help message and exit
   -dt, --dibco_tool     use dibco tool
   --path_dibco_bin [PATH_DIBCO_BIN]
-  --fg_type [FG_TYPE]
+  -fg_type [FG_TYPE]
   -s, --subfolders      evaluate subfolders
+  -f, --file_results    save results for each file
+  -i, --invert_imgs     invert input images
 ```
+The files in ``path_gt`` and ``path_img`` must have the same names (for example: BT_0.png).
 
 <!-- TODO: Examples -->
+### Example usage:
+The following two examples show the evaluation using our own evaluation script for F-Measure (f_measure.py).
+
+- Evaluation of _FG_1_. Uncertain regions are masked out.
+
+```bash
+python binar_eval.py path_to_msbin/test/labels path_to_results path_to_results/results.csv -fg_type=1
+```
+
+- Evaluation of _FG_2_. Uncertain regions are masked out.
+
+```bash
+python binar_eval.py path_to_msbin/test/labels path_to_results path_to_results/results.csv -fg_type=2
+```
+The following example demonstrates the evaluation using _DIBCO_metrics.exe_, which can be downloaded from [DIBCO 2019 website](https://vc.ee.duth.gr/dibco2019/).
+- First the resulting images must be converted to meet the _DIBCO_ requirements, here it is done for the _FG_1_ class:
+```bash
+python converter.py path_to_results_input path_to_results_output --msbin_path_gt=path_to_msbin/test/labels -fg_type=1
+```
+- Second call the eval script and tell it to use the _DIBCO_metrics.exe_ for evaluation.
+```bash
+python binar_eval.py path_to_msbin/test/labels path_to_results path_to_results/results.csv -fg_type=1 -dt 
+```
+The example above assumes that the _DIBCO_metrics.exe_ is located in the same folder as ```binar_eval.py```. If this is not the case you can pass the path with the _path_dibco_bin_ argument.
+
 
 
 ## Naming Convention
@@ -98,11 +126,11 @@ Each multispectral image in the dataset has been taken from a different manuscri
 ## Classes
 Both manuscripts contain cyrillic text written in iron gall ink.
 The corresponding foreground regions are colored black or brown.
-This class is hereafter denoted as _FG_.
+This class is hereafter denoted as _FG_1_.
 The document background class is abbreviated with _BG_.
-Additionally, a subset of the images contain characters that are written in red ink, denoted as _FGR_.
+Additionally, a subset of the images contain characters that are written in red ink, denoted as _FG_2_.
 The test set contains certain regions that are labeled as uncertain regions _UR_ in the ground truth images. 
-_UR_ denote regions, that could not be clearly identified as belonging to _FG_, _FGR_ or _BG_.
+_UR_ denote regions, that could not be clearly identified as belonging to _FG_1_, _FG_2__ or _BG_.
 These regions are excluded from the evaluation:
 Therefore, in the evaluation they are marked as belonging to the background - both in the ground truth images as well as in the resulting images.
 The training set does not contain uncertain regions, in order to allow for a training on entire image patches.
@@ -112,10 +140,30 @@ The ground truth contains a color-coded image for each multispectral image, wher
 
 | Label        | Description           | RGB color code  |
 | ------------- |:-------------:| -----:|
-| _FG_  | Main text         | (255, 255, 255) |
-| _FGR_ | Red ink           | (122, 122, 122) |
+| _FG_1_  | Main text         | (255, 255, 255) |
+| _FG_2_ | Red ink           | (122, 122, 122) |
 | _BG_  | Background        | (0, 0, 0)       |
 | _UR_  | Uncertain region  | (0, 0, 255)     |
+
+## Results
+Numerical results gained within my PhD thesis. Once it is published, I will link it here.
+### Training set:
+
+| Method        | FM    | p-FM  | PSNR  | DRD   |
+| ------------- |:-----:| -----:|:-----:| -----:|
+| ACE v1 [[Hollaus et al. 2015]](#[Hollaus-et-al.-2015])  | 87.66 | 87.75 | 14.27 | 13.04 |
+| ACE v2 [[Diem et al. 2016]](#[Diem-et-al.-2016])        | 87.54 | 87.83 | 14.35 | 13.53 |
+| GMM [[Hollaus et al. 2018]](#[Hollaus-et-al.-2018])     | 86.80 | 86.94 | 14.05 | 13.39 |
+| FCN [[Hollaus et al. 2019]](#[Hollaus-et-al.-2019])     | 92.15 | 94.24 | 15.97 | 6.87 |
+
+### Test set:
+
+| Method        | FM    | p-FM  | PSNR  | DRD   |
+| ------------- |:-----:| -----:|:-----:| -----:|
+| ACE v1 [[Hollaus et al. 2015]](#[Hollaus-et-al.-2015])  | 81.28 | 81.18 | 13.28 | 22.03 |
+| ACE v2 [[Diem et al. 2016]](#[Diem-et-al.-2016])        | 81.25 | 81.36 | 13.27 | 20.80 |
+| GMM [[Hollaus et al. 2018]](#[Hollaus-et-al.-2018])     | 80.00 | 80.28 | 13.18 | 20.35 |
+| FCN [[Hollaus et al. 2019]](#[Hollaus-et-al.-2019])     | 89.39 | 90.89 | 15.17 | 9.91 |
 
 ## Image Acquisition
 
@@ -141,32 +189,15 @@ F. Hollaus, S. Brenner and R. Sablatnig: "CNN based Binarization of MultiSpectra
 ### [Heinrich et al. 2012]
 M. P. Heinrich, M. Jenkinson, M. Bhushan, T. Matin, F. V. Gleeson, S. M. Brady, and J. A. Schnabel, “MIND: Modality independent neighbourhood descriptor for multi-modal deformable
 registration”. Medical Image Analysis, vol. 16, no. 7, pp. 1423–1435, 2012
-
-## eval-binarization
-Evaluate the performance of document image binarization methods.
-
-Measures the performance on a folder basis, given an input and a ground truth folder.
-The performance measure is saved in the form of CSV file.
-
-### Main function:
-
-```binar_eval.py```
-
-
-```bash
-usage: binar_eval.py [-h] [-dt] [--path_dibco_bin [PATH_DIBCO_BIN]]
-                     [--fg_type [FG_TYPE]] [-s]
-                     path_gt path_img path_csv
-
-positional arguments:
-  path_gt               path to the ground truth images
-  path_img              path to the result images
-  path_csv              path to the csv output file
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -dt, --dibco_tool     use dibco tool
-  --path_dibco_bin [PATH_DIBCO_BIN]
-  --fg_type [FG_TYPE]
-  -s, --subfolders      evaluate subfolders
-```
+### [Pratikakis et al. 2019]
+Ioannis Pratikakis, Konstantinos Zagoris, Xenofon Karagiannis, Lazaros T. Tsochatzidis, Tanmoy Mondal, Isabelle Marthot-Santaniello:
+ICDAR 2019 Competition on Document Image Binarization (DIBCO 2019). ICDAR 2019: 1547-1556
+### [Hollaus et al. 2015]
+Fabian Hollaus, Markus Diem, Robert Sablatnig:
+Binarization of MultiSpectral Document Images. CAIP (2) 2015: 109-120
+### [Diem et al. 2016]
+Markus Diem, Fabian Hollaus, Robert Sablatnig:
+MSIO: MultiSpectral Document Image BinarizatIOn. DAS 2016: 84-89
+### [Hollaus et al. 2018]
+Fabian Hollaus, Markus Diem, Robert Sablatnig:
+MultiSpectral Image Binarization using GMMs. ICFHR 2018: 570-575
