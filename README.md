@@ -27,7 +27,7 @@ Note that this is the second version of the dataset, where 10 images are removed
     │       └── fg_2            # Foreground 2 (red ink)    
 
 The encoding for the ground-truth images in the _labels_ folders is detailed below.
-The encoding in the _dibco_labels_ folders follows the _DIBCO_ [[Pratikakis et al. 2019]](#[Pratikakis-et-al.-2019]) convention: Black is foreground and white is background. Additionally, the weights for Pseudo-Recall and Pseudo-Precision [[Pratikakis et al. 2019]](#[Pratikakis-et-al.-2019] are included in these folders.
+The encoding in the _dibco_labels_ folders follows the _DIBCO_ [[Pratikakis et al. 2019]](#[Pratikakis-et-al.-2019]) convention: Black is foreground and white is background. Additionally, the weights for Pseudo-Recall and Pseudo-Precision [[Pratikakis et al. 2019]](#[Pratikakis-et-al.-2019]) are included in these folders.
 
 
 ## Usage
