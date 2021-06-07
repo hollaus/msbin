@@ -7,7 +7,7 @@ This dataset is named _MSBin_ which stands for MultiSpectral Document Binarizati
 ## Download
 The dataset is on Zenodo:
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3257366.svg)](https://doi.org/10.5281/zenodo.3257366)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4906106.svg)](https://doi.org/10.5281/zenodo.4906106)
 
 Note that this is the second version of the dataset, where 10 images are removed from the test set, because they were too varying from the training set. The results obtained on the first version can be found in  [[Hollaus et al. 2019]](#[Hollaus-et-al.-2019]).
 
